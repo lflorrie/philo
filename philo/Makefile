@@ -1,7 +1,7 @@
 NAME=philo
 
 CC=gcc
-CFLAGS=-Wall -Werror -Wextra
+CFLAGS=-Wall -Werror -Wextra -pthread
 
 SRC=main.c parser.c
 
