@@ -9,30 +9,66 @@ void	print_info(t_philo_info info)
 
 void	*func(void *args)
 {
-	printf("Philo spawned\n");
+	printf("Philo spawned ");
 	if (args == NULL)
 		printf("NULL\n");
 	else
-		printf("%s\n", (char*)args);
-	return (0);
+		printf("%i\n", *(int*)args);
+	return (args);
 }
 
-void	philo_cycle(t_philo_info info)
+t_philo	*create_philosophers(int n)
+{
+	t_philo	*philos;
+	int		i;
+
+	philos = malloc(sizeof(t_philo) * n);
+	i = 0;
+	while (i < n)
+	{
+		philos[i].num = i;
+		if (pthread_create(&(philos->thread), NULL, func, &philos[i].num) != 0)
+		{
+			printf("Error: thread not created\n");
+			free(philos);
+			return (NULL);
+		}
+		pthread_detach(philos[i].thread);
+		// pthread_join(philos[i].thread, NULL);
+		++i;
+	}
+	return (philos);
+}
+
+void	delete_philosophers(t_philo_info info,t_philo *philos)
 {
 	int	i;
-	pthread_t thread;
-	int			status_addr;
+
 	i = 0;
 	while (i < info.philos)
 	{
-		if (pthread_create(&thread, NULL, func, "Kek") != 0)
-		{
-			printf("Error: thread not created\n");
-			return ;
-		}
-		pthread_join(thread, (void **)&status_addr);
 		++i;
 	}
+	free(philos);
+}
+
+int	philo_cycle(t_philo_info info)
+{
+	t_philo *philos;
+	int		i;
+
+	i = 0;
+	philos = create_philosophers(info.philos);
+	if (philos == NULL)
+		return (printf("Error: philos == NULL\n") + 1);
+	while (i < philos->num)
+	{
+		// pthread_join(philos[i].thread, NULL);
+		++i;
+	}
+	usleep(100);
+	// delete_philosophers(info, philos);	
+	return (0);
 }
 
 int	main(int argc, char **argv)
