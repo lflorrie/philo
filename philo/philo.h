@@ -16,9 +16,10 @@ typedef struct s_philo_info
 
 typedef struct s_philo
 {
-	pthread_t	thread;
-	int			num;
-}				t_philo;
+	pthread_t		thread;
+	int				num;
+	t_philo_info	*info;
+}					t_philo;
 
 t_philo_info	parser(int argc, char **argv);
 
