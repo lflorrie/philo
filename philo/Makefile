@@ -1,22 +1,33 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lflorrie <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2021/07/08 10:50:48 by lflorrie          #+#    #+#              #
+#    Updated: 2021/07/08 10:50:49 by lflorrie         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME=philo
 
 CC=gcc
 CFLAGS=-Wall -Werror -Wextra -pthread
 
-SRC=main.c parser.c
+SRC=main.c \
+	parser.c \
+	philo.c
 
+INC=philo.h
 OBJ=$(SRC:.c=.o)
-DEP=$(SRC:.c=.d)
 
 all:$(NAME)
 
 %.o:%.c
 	$(CC) -c $(CFLAGS) $< -o $@
-	$(CC) -MM $(CFLAGS) $< > $*.d
 
--include $(OBJ:.o=.d)
-
-$(NAME):$(OBJ)
+$(NAME):$(OBJ) $(INC)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 clean:

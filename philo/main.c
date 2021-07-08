@@ -1,48 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lflorrie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/07/08 10:47:38 by lflorrie          #+#    #+#             */
+/*   Updated: 2021/07/08 10:47:41 by lflorrie         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
-#include <time.h>
-#include <sys/time.h>
+
 void	print_info(t_philo_info info)
 {
 	printf("ph: %i\ndie time: %i\neat time: %i\nsleep time: %i\nmax eat: %i\n",
-	 info.philos, info.die_time, info.eat_time, info.sleep_time,
-	 info.max_eat);
-}
-
-int	check_life_time(t_philo *philo, struct timeval start)
-{
-	struct timeval stop;
-	
-	gettimeofday(&stop, NULL);
-	if (philo->info->die_time <= (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec)
-	{
-		printf("philo->info->die_time = %i\n", philo->info->die_time);
-		printf("-----TIME: die time = %i <= %ld time ------\n", philo->info->die_time, (stop.tv_sec - start.tv_sec) * 1000000 + stop.tv_usec - start.tv_usec);
-		return (1);
-	}
-	return (0);
-}
-
-void	*func(void *args)
-{
-	struct timeval start;
-	t_philo		*philo;
-
-	philo = (t_philo *)args;
-	gettimeofday(&start, NULL);
-	printf("Philo spawned ");
-	if (args == NULL)
-		printf("NULL\n");
-	else
-		printf("%i\n", philo->num);
-	while (1)
-	{
-		if (check_life_time(philo, start))
-		{
-			printf("philo %i dead\n", philo->num);
-			return (NULL);
-		}
-	}
-	return (args);
+		info.philos, info.die_time, info.eat_time, info.sleep_time,
+		info.max_eat);
 }
 
 t_philo	*create_philosophers(t_philo_info *info)
@@ -51,12 +25,13 @@ t_philo	*create_philosophers(t_philo_info *info)
 	int		i;
 
 	philos = malloc(sizeof(t_philo) * info->philos);
-	i = 0;
-	while (i < info->philos)
+	i = 1;
+	while (i <= info->philos)
 	{
 		philos[i].num = i;
 		philos[i].info = info;
-		if (pthread_create(&(philos->thread), NULL, func, &philos[i]) != 0)
+		gettimeofday(&info->time_start_sim, NULL);
+		if (pthread_create(&(philos->thread), NULL, philo_life, &philos[i]) != 0)
 		{
 			printf("Error: thread not created\n");
 			free(philos);
@@ -81,23 +56,27 @@ void	delete_philosophers(t_philo_info info,t_philo *philos)
 	free(philos);
 }
 
-int	philo_cycle(t_philo_info *info)
+int	philo_start(t_philo_info *info)
 {
 	t_philo *philos;
 	int		i;
 
 	i = 0;
 	philos = create_philosophers(info);
-	// while (1){}
 	if (philos == NULL)
 		return (printf("Error: philos == NULL\n") + 1);
-	while (i < philos->num)
+	
+	while (info->dead != 0)
 	{
-		// pthread_join(philos[i].thread, NULL);
+		if (i == philos[i].info->philos)
+			i = 0;
+		if (check_life_time(philos, philos->last_time_eat))
+		{
+			printf("philo %i dead\n", philos[i].num);
+			philos[i].info->dead++;
+		}
 		++i;
 	}
-	// usleep(1000000000);
-	while (1){}
 	// delete_philosophers(*info, philos);	
 	return (0);
 }
@@ -110,7 +89,7 @@ int	main(int argc, char **argv)
 	{
 		info = parser(argc, argv);
 		print_info(info);
-		philo_cycle(&info);
+		philo_start(&info);
 	}
 	return (0);
 }
