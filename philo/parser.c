@@ -25,7 +25,8 @@ t_philo_info	parser(int argc, char **argv)
 		info.max_eat = atoi(argv[5]); // ft_atoi
 	else
 		info.max_eat = 0;
-	info.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * info.philos);
+	info.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
+			* info.philos);
 	i = 0;
 	while (i < info.philos)
 	{

@@ -12,6 +12,7 @@
 
 #include "philo.h"
 
+
 void	print_info(t_philo_info info)
 {
 	printf("ph: %i\ndie time: %i\neat time: %i\nsleep time: %i\nmax eat: %i\n",
@@ -25,18 +26,20 @@ t_philo	*create_philosophers(t_philo_info *info)
 	int		i;
 
 	philos = malloc(sizeof(t_philo) * info->philos);
-	i = 1;
-	while (i <= info->philos)
+	i = 0;
+	while (i < info->philos)
 	{
-		philos[i].num = i;
+		philos[i].num = i + 1;
 		philos[i].info = info;
 		gettimeofday(&info->time_start_sim, NULL);
-		if (pthread_create(&(philos->thread), NULL, philo_life, &philos[i]) != 0)
+		if (pthread_create(&(philos->thread), NULL,
+				philo_life, &(philos[i])) != 0)
 		{
 			printf("Error: thread not created\n");
 			free(philos);
 			return (NULL);
 		}
+		usleep(10);
 		// pthread_detach(philos[i].thread);
 		// pthread_join(philos[i].thread, NULL);
 		++i;
@@ -44,7 +47,7 @@ t_philo	*create_philosophers(t_philo_info *info)
 	return (philos);
 }
 
-void	delete_philosophers(t_philo_info info,t_philo *philos)
+void	delete_philosophers(t_philo_info info, t_philo *philos)
 {
 	int	i;
 
@@ -58,17 +61,16 @@ void	delete_philosophers(t_philo_info info,t_philo *philos)
 
 int	philo_start(t_philo_info *info)
 {
-	t_philo *philos;
+	t_philo	*philos;
 	int		i;
 
 	i = 0;
 	philos = create_philosophers(info);
 	if (philos == NULL)
 		return (printf("Error: philos == NULL\n") + 1);
-	
-	while (info->dead != 0)
+	while (info->dead == 0)
 	{
-		if (i == philos[i].info->philos)
+		if (i + 1 == philos[i].info->philos) // check me pls
 			i = 0;
 		if (check_life_time(philos, philos->last_time_eat))
 		{
@@ -83,7 +85,7 @@ int	philo_start(t_philo_info *info)
 
 int	main(int argc, char **argv)
 {
-	t_philo_info info;
+	t_philo_info	info;
 
 	if (argc == 5 || argc == 6)
 	{
