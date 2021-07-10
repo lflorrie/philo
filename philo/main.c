@@ -27,11 +27,12 @@ t_philo	*create_philosophers(t_philo_info *info)
 
 	philos = malloc(sizeof(t_philo) * info->philos);
 	i = 0;
+	gettimeofday(&info->time_start_sim, NULL);
 	while (i < info->philos)
 	{
+		gettimeofday(&(philos[i].last_time_eat), NULL);
 		philos[i].num = i + 1;
 		philos[i].info = info;
-		gettimeofday(&info->time_start_sim, NULL);
 		if (pthread_create(&(philos->thread), NULL,
 				philo_life, &(philos[i])) != 0)
 		{
@@ -70,9 +71,9 @@ int	philo_start(t_philo_info *info)
 		return (printf("Error: philos == NULL\n") + 1);
 	while (info->dead == 0)
 	{
-		if (i + 1 == philos[i].info->philos) // check me pls
+		if (i == info->philos)
 			i = 0;
-		if (check_life_time(philos, philos->last_time_eat))
+		if (check_life_time(philos, philos[i].last_time_eat))
 		{
 			printf("philo %i dead\n", philos[i].num);
 			philos[i].info->dead++;
