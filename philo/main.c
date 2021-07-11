@@ -40,7 +40,7 @@ t_philo	*create_philosophers(t_philo_info *info)
 			free(philos);
 			return (NULL);
 		}
-		usleep(10);
+		usleep(50);
 		// pthread_detach(philos[i].thread);
 		// pthread_join(philos[i].thread, NULL);
 		++i;
@@ -73,7 +73,7 @@ int	philo_start(t_philo_info *info)
 	{
 		if (i == info->philos)
 			i = 0;
-		if (check_life_time(philos, philos[i].last_time_eat))
+		if (check_life_time(&philos[i], philos[i].last_time_eat))
 		{
 			printf("philo %i dead\n", philos[i].num);
 			philos[i].info->dead++;
