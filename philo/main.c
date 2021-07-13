@@ -40,28 +40,37 @@ t_philo	*create_philosophers(t_philo_info *info)
 			free(philos);
 			return (NULL);
 		}
-		pthread_detach(philos[i].thread);
 		usleep(100);
 		++i;
 	}
 	return (philos);
 }
 
-void	free_philos(t_philo_info *info, t_philo *philos)
-{
-	int	i;
+// void philo_killer(t_philo *philos)
+// {
+// 	int				i;
+// 	t_philo_info	*info;
 
-	i = 0;
-	while (i < info->philos)
-	{
-		pthread_join(philos[i].thread, NULL);
-		pthread_mutex_destroy(&info->forks[i]);
-	}
-	free(philos);
-	pthread_mutex_unlock(&info->mutex_write);
-	// pthread_mutex_destroy(&info->mutex_write);
-
-}
+// 	i = 0;
+// 	info = philos->info;
+// 	while (info->dead == 0 && info->finish_eating != info->max_eat)
+// 	{
+// 		if (philos[i].eat_counter == info->max_eat + 1) // kek
+// 			info->finish_eating++;
+// 		if (check_life_time(&(philos[i]), philos[i].last_time_eat))
+// 		{
+// 			info->dead++;
+// 			pthread_mutex_lock(&info->mutex_write);
+// 			printf("%ld ms philo %i died\n", get_time(info->time_start_sim), philos[i].num);
+// 			fflush(stdout);
+// 		}
+// 		++i;
+// 		if (i == info->philos)
+// 			i = 0;
+// 	}
+// 	if (info->finish_eating == info->max_eat)
+// 		pthread_mutex_lock(&info->mutex_write);
+// }
 
 int	philo_start(t_philo_info *info)
 {
@@ -74,26 +83,21 @@ int	philo_start(t_philo_info *info)
 		return (printf("Error: philos == NULL\n") + 1);
 	while (info->dead == 0 && info->finish_eating != info->max_eat)
 	{
-		if (philos[i].eat_counter == info->max_eat)
-		{
-			printf("log %i    %i\n", philos[i].eat_counter, info->max_eat);
+		if (philos[i].eat_counter == info->max_eat + 1) // kek
 			info->finish_eating++;
-			printf("log %i \n", info->finish_eating);
-		}
 		if (check_life_time(&(philos[i]), philos[i].last_time_eat))
 		{
 			info->dead++;
 			pthread_mutex_lock(&info->mutex_write);
-			printf("%ld ms philo %i died\n", get_time(info->time_start_sim), philos[i].num);
+			printf("%ld ms philo %i died\n",
+				get_time(info->time_start_sim), philos[i].num);
 			fflush(stdout);
 		}
 		++i;
 		if (i == info->philos)
 			i = 0;
 	}
-	if (info->finish_eating == info->max_eat)
-		pthread_mutex_lock(&info->mutex_write);
-	free(philos);
+	free_philos(info, philos);
 	return (0);
 }
 
@@ -106,6 +110,7 @@ int	main(int argc, char **argv)
 		info = parser(argc, argv);
 		print_info(info);
 		philo_start(&info);
+		free_info(info);
 	}
 	else
 	{

@@ -60,6 +60,20 @@ void			*philo_life(void *args);
 
 void			my_sleep(int time);
 
-long get_time(struct timeval start);
+long			get_time(struct timeval start);
 
+/* free functions */
+
+void			free_info(t_philo_info info);
+
+void			free_philos(t_philo_info *info, t_philo *philos);
+
+/* utils */
+int				ft_atoi(const char *str);
+
+int				check_life_time(t_philo *philo, struct timeval start);
+
+void			my_sleep(int time);
+
+long			get_time(struct timeval start);
 #endif

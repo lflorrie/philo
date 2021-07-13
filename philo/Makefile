@@ -13,11 +13,13 @@
 NAME=philo
 
 CC=gcc
-CFLAGS=-Wall -Werror -Wextra -pthread
+# CFLAGS=-Wall -Werror -Wextra
+CFLAGS= -pthread
 
 SRC=main.c \
 	parser.c \
-	philo.c
+	philo.c \
+	utils.c
 
 INC=philo.h
 OBJ=$(SRC:.c=.o)

@@ -12,44 +12,14 @@
 
 #include "philo.h"
 
-long get_time(struct timeval start)
-{
-	struct timeval stop;
-
-	gettimeofday(&stop, NULL);
-	unsigned long long start1 = start.tv_sec * 1000 + start.tv_usec / 1000; 
-	unsigned long long stop1 = stop.tv_sec * 1000 + stop.tv_usec / 1000; 
-	return (stop1 - start1);
-}
-
-void	my_sleep(int time)
-{
-	struct timeval start;
-
-	gettimeofday(&start, NULL);
-	while (get_time(start) < time)
-		usleep(50);
-}
-
-int	check_life_time(t_philo *philo, struct timeval start)
-{
-	struct timeval	stop;
-
-	gettimeofday(&stop, NULL);
-	if (philo->info->die_time <= get_time(start))
-		return (1);
-	return (0);
-}
-
 void	print_state(t_philo *philo, t_enum state)
 {
-	long long tmp;
+	long long	tmp;
 
 	tmp = get_time(philo->info->time_start_sim);
 	if (philo->info->dead != 0 || tmp < 0)
 		return ;
 	pthread_mutex_lock(&philo->info->mutex_write);
-
 	printf("%ld ms %i", get_time(philo->info->time_start_sim), philo->num);
 	if (state == THINKING)
 		printf(" is thinking\n");
@@ -99,7 +69,8 @@ void	*philo_life(void *args)
 	else
 		philo->r_fork = &philo->info->forks[philo->num];
 	gettimeofday(&philo->last_time_eat, NULL);
-	while (1)
+	while (philo->info->finish_eating != philo->info->max_eat
+		&& philo->info->dead == 0)
 	{
 		philo_eat(philo);
 		philo_sleep(philo);
