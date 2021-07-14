@@ -46,32 +46,6 @@ t_philo	*create_philosophers(t_philo_info *info)
 	return (philos);
 }
 
-// void philo_killer(t_philo *philos)
-// {
-// 	int				i;
-// 	t_philo_info	*info;
-
-// 	i = 0;
-// 	info = philos->info;
-// 	while (info->dead == 0 && info->finish_eating != info->max_eat)
-// 	{
-// 		if (philos[i].eat_counter == info->max_eat + 1) // kek
-// 			info->finish_eating++;
-// 		if (check_life_time(&(philos[i]), philos[i].last_time_eat))
-// 		{
-// 			info->dead++;
-// 			pthread_mutex_lock(&info->mutex_write);
-// 			printf("%ld ms philo %i died\n", get_time(info->time_start_sim), philos[i].num);
-// 			fflush(stdout);
-// 		}
-// 		++i;
-// 		if (i == info->philos)
-// 			i = 0;
-// 	}
-// 	if (info->finish_eating == info->max_eat)
-// 		pthread_mutex_lock(&info->mutex_write);
-// }
-
 int	philo_start(t_philo_info *info)
 {
 	t_philo	*philos;
@@ -83,7 +57,7 @@ int	philo_start(t_philo_info *info)
 		return (printf("Error: philos == NULL\n") + 1);
 	while (info->dead == 0 && info->finish_eating != info->max_eat)
 	{
-		if (philos[i].eat_counter == info->max_eat + 1) // kek
+		if (philos[i].eat_counter == info->max_eat + 1)
 			info->finish_eating++;
 		if (check_life_time(&(philos[i]), philos[i].last_time_eat))
 		{
@@ -103,14 +77,20 @@ int	philo_start(t_philo_info *info)
 
 int	main(int argc, char **argv)
 {
-	t_philo_info	info;
+	t_philo_info	*info;
 
 	if (argc == 5 || argc == 6)
 	{
 		info = parser(argc, argv);
-		print_info(info);
-		philo_start(&info);
-		free_info(info);
+		if (info == NULL)
+		{
+			printf("Error: parser - failed\n");
+			fflush(stdout);
+			return (1);
+		}
+		print_info(*info);
+		philo_start(info);
+		free_info(*info);
 	}
 	else
 	{

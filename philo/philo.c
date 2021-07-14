@@ -20,6 +20,11 @@ void	print_state(t_philo *philo, t_enum state)
 	if (philo->info->dead != 0 || tmp < 0)
 		return ;
 	pthread_mutex_lock(&philo->info->mutex_write);
+	if (philo->info->dead != 0)
+	{
+		pthread_mutex_unlock(&philo->info->mutex_write);
+		return ;
+	}
 	printf("%ld ms %i", get_time(philo->info->time_start_sim), philo->num);
 	if (state == THINKING)
 		printf(" is thinking\n");
@@ -49,6 +54,13 @@ void	philo_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->l_fork);
 	print_state(philo, FORK);
+	if (philo->l_fork == philo->r_fork)
+	{
+		while (philo->info->dead == 0)
+			usleep(50);
+		pthread_mutex_unlock(philo->l_fork);
+		return ;
+	}
 	pthread_mutex_lock(philo->r_fork);
 	print_state(philo, FORK);
 	print_state(philo, EATING);
@@ -73,6 +85,8 @@ void	*philo_life(void *args)
 		&& philo->info->dead == 0)
 	{
 		philo_eat(philo);
+		if (philo->info->dead != 0)
+			break ;
 		philo_sleep(philo);
 		print_state(philo, THINKING);
 	}

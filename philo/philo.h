@@ -52,7 +52,7 @@ typedef struct s_philo
 	struct timeval	last_time_eat;
 }					t_philo;
 
-t_philo_info	parser(int argc, char **argv);
+t_philo_info	*parser(int argc, char **argv);
 
 int				check_life_time(t_philo *philo, struct timeval start);
 
