@@ -90,7 +90,7 @@ int	main(int argc, char **argv)
 		}
 		print_info(*info);
 		philo_start(info);
-		free_info(*info);
+		free_info(info);
 	}
 	else
 	{

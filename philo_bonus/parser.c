@@ -43,7 +43,10 @@ t_philo_info	*init_mutexes(t_philo_info *info)
 		free(info->forks);
 		return (NULL);
 	}
-	info->dead = 0;
+	sem_unlink("Count of dead");
+	info->dead = sem_open("Count of dead", O_CREAT | O_EXCL, 0644, 0);
+	if (info->dead == SEM_FAILED)
+		return (NULL);
 	info->finish_eating = 0;
 	return (info);
 }
@@ -77,21 +80,25 @@ t_philo_info	*parser(int argc, char **argv)
 	return (info);
 }
 
-void	free_info(t_philo_info info)
+void	free_info(t_philo_info *info)
 {
 	int	i;
 
 	i = 0;
-	pthread_mutex_destroy(&info.mutex_write);
-	if (info.forks)
+
+	sem_close(info->dead);
+	sem_unlink("Count of dead");
+	pthread_mutex_destroy(&info->mutex_write);
+	if (info->forks)
 	{
-		while (i < info.philos)
+		while (i < info->philos)
 		{
-			pthread_mutex_destroy(&info.forks[i]);
+			pthread_mutex_destroy(&info->forks[i]);
 			++i;
 		}
-		free(info.forks);
+		free(info->forks);
 	}
+	free(info);
 }
 
 void	free_philos(t_philo_info *info, t_philo *philos)

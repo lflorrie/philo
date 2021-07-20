@@ -64,7 +64,7 @@ long			get_time(struct timeval start);
 
 /* free functions */
 
-void			free_info(t_philo_info info);
+void			free_info(t_philo_info *info);
 
 void			free_philos(t_philo_info *info, t_philo *philos);
 

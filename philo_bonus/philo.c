@@ -12,15 +12,30 @@
 
 #include "philo.h"
 
+int	check_dead(t_philo *philo)
+{
+	int	res;
+
+	write(1, "GG\n", 3);
+	res = sem_wait(philo->info->dead);
+	write(1, "OK\n", 3);
+	if (res == 0)
+	{
+		sem_post(philo->info->dead);
+		return (1);
+	}
+	return (0);
+}
+
 void	print_state(t_philo *philo, t_enum state)
 {
 	long long	tmp;
 
 	tmp = get_time(philo->info->time_start_sim);
-	if (philo->info->dead != 0 || tmp < 0)
+	if (check_dead(philo) == 0 || tmp < 0)
 		return ;
 	pthread_mutex_lock(&philo->info->mutex_write);
-	if (philo->info->dead != 0)
+	if (check_dead(philo) == 0)
 	{
 		pthread_mutex_unlock(&philo->info->mutex_write);
 		return ;
@@ -56,9 +71,8 @@ void	philo_eat(t_philo *philo)
 	print_state(philo, FORK);
 	if (philo->l_fork == philo->r_fork)
 	{
-		while (philo->info->dead == 0)
+		while (check_dead(philo) != 1)
 			usleep(50);
-		write(1, "OK\n", 3); // ERROR 
 		pthread_mutex_unlock(philo->l_fork);
 		return ;
 	}
@@ -80,10 +94,10 @@ void	philo_life(t_philo *philo)
 		philo->r_fork = &philo->info->forks[philo->num];
 	gettimeofday(&philo->last_time_eat, NULL);
 	while (philo->info->finish_eating != philo->info->max_eat
-		&& philo->info->dead == 0)
+		&& check_dead(philo) == 0)
 	{
 		philo_eat(philo);
-		if (philo->info->dead != 0)
+		if (check_dead(philo) != 0)
 			break ;
 		philo_sleep(philo);
 		print_state(philo, THINKING);

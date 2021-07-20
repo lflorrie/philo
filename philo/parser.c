@@ -77,21 +77,22 @@ t_philo_info	*parser(int argc, char **argv)
 	return (info);
 }
 
-void	free_info(t_philo_info info)
+void	free_info(t_philo_info *info)
 {
 	int	i;
 
 	i = 0;
-	pthread_mutex_destroy(&info.mutex_write);
-	if (info.forks)
+	pthread_mutex_destroy(&info->mutex_write);
+	if (info->forks)
 	{
-		while (i < info.philos)
+		while (i < info->philos)
 		{
-			pthread_mutex_destroy(&info.forks[i]);
+			pthread_mutex_destroy(&info->forks[i]);
 			++i;
 		}
-		free(info.forks);
+		free(info->forks);
 	}
+	free(info);
 }
 
 void	free_philos(t_philo_info *info, t_philo *philos)

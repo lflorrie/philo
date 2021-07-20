@@ -18,6 +18,10 @@
 # include <pthread.h>
 # include <time.h>
 # include <sys/time.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <semaphore.h>
+# include <fcntl.h>
 
 typedef enum e_enum
 {
@@ -35,7 +39,7 @@ typedef struct s_philo_info
 	int				sleep_time;
 	int				max_eat;
 	int				finish_eating;
-	int				dead;
+	sem_t			*dead;
 	struct timeval	time_start_sim;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	mutex_write;
@@ -62,9 +66,11 @@ void			my_sleep(int time);
 
 long			get_time(struct timeval start);
 
+int				check_dead(t_philo *philo);
+
 /* free functions */
 
-void			free_info(t_philo_info info);
+void			free_info(t_philo_info *info);
 
 void			free_philos(t_philo_info *info, t_philo *philos);
 
